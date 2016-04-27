@@ -1,32 +1,38 @@
 package jp.co.plusize.ota_tomomi.calculate_sales;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
 public class readbranch {
 	public static void main (String[] args){
 
-		//支店コード、商品コードをキーとして支店名・商品名を参照するマップリストの定義
-		HashMap<String,String> map = new HashMap<String,String>();
+		//支店コードをキーとして支店名を参照するマップリストの定義
+		HashMap<String,String> branchmap = new HashMap<String,String>();
+		//商品コードをキーとして商品名を参照するマップリストの定義
+		HashMap<String,String> commoditymap = new HashMap<String,String>();
 
-		//支店コード、商品コードをキーとして売上金額を参照するマップリストの定義
-		HashMap<String,Long> revenuemap = new HashMap<String,Long>();
+		//支店コードをキーとして支店別の売上金額を参照するマップリストの定義
+		HashMap<String,Long> branchrevenuemap = new HashMap<String,Long>();
+		//商品コードをキーとして商品別の売上金額を参照するマップリストの定義
+		HashMap<String,Long> commodityrevenuemap = new HashMap<String,Long>();
 
+		ArrayList<String> revenueList = new ArrayList<String>();
+		ArrayList<Integer> fileList = new ArrayList<Integer>();
 
-		//ArrayList branchNumberList = new ArrayList();
-		//ArrayList commodityNumberList = new ArrayList();
-		ArrayList revenueList = new ArrayList();
 
 
 		//支店定義ファイルの読み込み
 		try{
-			File fileb = new File(args[0] + "\\branch.list");
+			File fileb = new File(args[0], "branch.list");
 			FileReader frb = new FileReader(fileb);
 			BufferedReader brb = new BufferedReader(frb);
 			String sb;
@@ -45,8 +51,8 @@ public class readbranch {
 						}
 
 						//支店コードをキーとして支店名をマップリストに追加
-						map.put(cols[0],cols[1]);//支店名・商品名のマップ
-						revenuemap.put(cols[0],new Long(0));//売上金額のマップ
+						branchmap.put(cols[0],cols[1]);//支店名のマップ
+						branchrevenuemap.put(cols[0],new Long(0));//支店別売上金額のマップ
 
 
 					}
@@ -69,7 +75,7 @@ public class readbranch {
 
 		//商品定義ファイルの読み込み
 		try{
-			File filec = new File(args[0] + "\\commodity.list");
+			File filec = new File(args[0] , "commodity.list");
 			FileReader frc = new FileReader(filec);
 			BufferedReader brc = new BufferedReader(frc);
 			String sc;
@@ -85,8 +91,8 @@ public class readbranch {
 						}
 
 				    	//商品コードをキーとして商品名をマップリストに追加
-						map.put(cols[0],cols[1]);//支店名・商品名のマップ
-						revenuemap.put(cols[0],new Long(0));//売上金額のマップ
+						commoditymap.put(cols[0],cols[1]);//商品名のマップ
+						commodityrevenuemap.put(cols[0],new Long(0));//商品別売上金額のマップ
 
 
 
@@ -114,33 +120,158 @@ public class readbranch {
 		String[] files = dir.list(new MyFilter());
 
 
+		//連番かどうか
+		for(int i = 0; i < files.length; i++){
+			//System.out.println(files[i]);
+
+			int index = files[i].lastIndexOf(".");
+			fileList.add(Integer.parseInt(files[i].substring(0,index)));
+			//System.out.println(fileList.get(i));
+
+
+		}
+		int max = fileList.get(0);
+		int min = fileList.get(0);
+
+		for (int i=0; i<fileList.size(); i++) {
+			if (max < fileList.get(i)) {	//現在の最大値よりも大きい値が出たら
+				max = fileList.get(i);	//変数maxに値を入れ替える
+			}
+			if (min > fileList.get(i)) {	//現在の最小値よりも小さい値が出たら
+				min = fileList.get(i);	//変数minに値を入れ替える
+			}
+		}
+		if(max - min != fileList.size() - 1){
+			System.out.println("売上ファイル名が連番になっていません");
+			return;
+		}
+
+
+
+
 		for(int i = 0; i < files.length; i++){
 			//   System.out.println(files[i]);
 
 			//売上ファイル読み込み
 			try{
-				File rcdfile = new File(args[0] + "\\" + files[i]);
+				File rcdfile = new File(args[0] + File.separator + files[i]);
 				FileReader rcdfr = new FileReader(rcdfile);
 				BufferedReader rcdbr = new BufferedReader(rcdfr);
 				String rcds;
 
-				//売上ファイルデータ集計
+
 				while((rcds = rcdbr.readLine()) != null){
 					revenueList.add(rcds);
 
 
-					}
-				for(int j = 0; j < revenueList.size(); j++){
-					System.out.println(revenueList.get(j));
+
+				}
+				if(revenueList.size() > 3){
+					System.out.println(files[i] +"のフォーマットが不正です");
+					return;
 				}
 
+				if(branchrevenuemap.containsKey(revenueList.get(0)) == false){
+					System.out.println(files[i] +"の支店コードが不正です");
+					return;
+				}
+				if(commodityrevenuemap.containsKey(revenueList.get(1)) == false){
+					System.out.println(files[i] +"の商品コードが不正です");
+					return;
+				}
+
+
+				//売上ファイルデータ集計
+				//支店別
+				branchrevenuemap.put(revenueList.get(0),branchrevenuemap.get(revenueList.get(0)) + Long.parseLong(revenueList.get(2)));
+				commodityrevenuemap.put(revenueList.get(1),commodityrevenuemap.get(revenueList.get(1)) + Long.parseLong(revenueList.get(2)));
+
+
+				//10桁を超えたらエラーを返す
+				if(String.valueOf(branchrevenuemap.get(revenueList.get(0))).length() > 10 ){
+					System.out.println("合計金額が10桁を超えました");
+					return;
+				}
+
+
+
+
+				revenueList.clear();
 				rcdbr.close();
 			}
 			catch(IOException e){
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました1");
+				return;
 
 			}
-			//売上集計
+			catch(IndexOutOfBoundsException e){
+				System.out.println("予期せぬエラーが発生しました2");
+				return;
+
+			}
+			catch(NullPointerException e){
+				System.out.println("予期せぬエラーが発生しました3");
+				return;
+
+			}
+
+
+
+			//long型に格納できない桁数だったときのエラー
+			catch(NumberFormatException e){
+				System.out.println("合計金額が10桁を超えました");
+				return;
+
+			}
+
+
+
+
+		}
+		//支店別集計ファイルの作成
+		try{
+			File branchfile = new File(args[0],"branch.out");
+			branchfile.createNewFile();
+
+			FileWriter fwb = new FileWriter(branchfile);
+			BufferedWriter bwb = new BufferedWriter(fwb);
+
+
+			for(Map.Entry<String,String> e : branchmap.entrySet()){
+				bwb.write(e.getKey() + "," + e.getValue() + "," + branchrevenuemap.get(e.getKey()) + "\r\n");
+
+
+			}
+
+			bwb.close();
+		}
+		catch(IOException e){
+			System.out.println("予期せぬエラーが発生しました");
+			return;
+
+		}
+
+		//商品別集計ファイルの作成
+		try{
+			File commodityfile = new File(args[0],"commodity.out");
+			commodityfile.createNewFile();
+
+			FileWriter fwc = new FileWriter(commodityfile);
+			BufferedWriter bwc = new BufferedWriter(fwc);
+
+
+			for(Map.Entry<String,String> e : commoditymap.entrySet()){
+				bwc.write(e.getKey() + "," + e.getValue() + "," + commodityrevenuemap.get(e.getKey()) + "\r\n");
+
+
+			}
+
+			bwc.close();
+		}
+		catch(IOException e){
+			System.out.println("予期せぬエラーが発生しました");
+			return;
+
 		}
 
 
@@ -165,16 +296,10 @@ public class readbranch {
 			//"."以前の文字列を取り出す
 			String fileName = name.substring(0,index);
 
-
-
-
-
-			//拡張子がrcdかつファイル名が8桁（連番の条件を入れたい）
+			//拡張子がrcdかつファイル名が8桁
 			if(ext.equals("rcd") == true && fileName.length() == 8){
 				return true;
 				}
-
-
 
 			return false;
 	}
