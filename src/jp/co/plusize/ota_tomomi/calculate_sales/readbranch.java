@@ -36,7 +36,7 @@ public class readbranch {
 
 		//支店定義ファイルの読み込み
 		try{
-			File fileb = new File(args[0], "branch.list");
+			File fileb = new File(args[0], "branch.lst");
 			FileReader frb = new FileReader(fileb);
 			BufferedReader brb = new BufferedReader(frb);
 			String sb;
@@ -79,7 +79,7 @@ public class readbranch {
 
 		//商品定義ファイルの読み込み
 		try{
-			File filec = new File(args[0] , "commodity.list");
+			File filec = new File(args[0] , "commodity.lst");
 			FileReader frc = new FileReader(filec);
 			BufferedReader brc = new BufferedReader(frc);
 			String sc;
