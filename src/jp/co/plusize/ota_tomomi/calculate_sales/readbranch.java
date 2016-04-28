@@ -19,6 +19,13 @@ import java.util.regex.Pattern;
 public class readbranch {
 	public static void main (String[] args){
 
+		//コマンドライン引数が渡されていなかったとき、2つ以上あるときの処理
+		if(args.length != 1 ){
+			System.out.println("予期せぬエラーが発生しました");
+			return;
+		}
+
+
 		//支店コードをキーとして支店名を参照するマップリストの定義
 		HashMap<String,String> branchmap = new HashMap<String,String>();
 		//商品コードをキーとして商品名を参照するマップリストの定義
@@ -31,6 +38,7 @@ public class readbranch {
 
 		ArrayList<String> revenueList = new ArrayList<String>();
 		ArrayList<Integer> fileList = new ArrayList<Integer>();
+		//ArrayList<File> directoryorfileList = new ArrayList<>();
 
 
 
@@ -40,7 +48,6 @@ public class readbranch {
 			FileReader frb = new FileReader(fileb);
 			BufferedReader brb = new BufferedReader(frb);
 			String sb;
-
 
 
 				while((sb = brb.readLine()) != null){
@@ -123,17 +130,27 @@ public class readbranch {
 		File dir = new File(args[0]);
 		String[] files = dir.list(new MyFilter());
 
-
 		//連番かどうか
 		for(int i = 0; i < files.length; i++){
 			//System.out.println(files[i]);
 
-			int index = files[i].lastIndexOf(".");
-			fileList.add(Integer.parseInt(files[i].substring(0,index)));
-			//System.out.println(fileList.get(i));
+			File a = new File(args[0] + File.separator + files[i]);
+
+			if(a.isFile()){
+				int index = files[i].lastIndexOf(".");
+				fileList.add(Integer.parseInt(files[i].substring(0,index)));
+				//System.out.println(fileList.get(i));
+
+
+			}
+			else{
+				files[i] = null;
+			}
+
 
 
 		}
+
 		int max = fileList.get(0);
 		int min = fileList.get(0);
 
@@ -149,8 +166,6 @@ public class readbranch {
 			System.out.println("売上ファイル名が連番になっていません");
 			return;
 		}
-
-
 
 
 		for(int i = 0; i < files.length; i++){
@@ -170,7 +185,7 @@ public class readbranch {
 
 
 				}
-				if(revenueList.size() > 3){
+				if(revenueList.size() != 3){
 					System.out.println(files[i] +"のフォーマットが不正です");
 					return;
 				}
@@ -192,7 +207,7 @@ public class readbranch {
 
 
 				//10桁を超えたらエラーを返す
-				if(String.valueOf(branchrevenuemap.get(revenueList.get(0))).length() > 10 ){
+				if(String.valueOf(branchrevenuemap.get(revenueList.get(0))).length() > 10 || String.valueOf(commodityrevenuemap.get(revenueList.get(0))).length() > 10 ){
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
@@ -317,9 +332,10 @@ public class readbranch {
 	public static boolean isAlphabet(String s) {
 		return Pattern.compile("\\W").matcher(s).find();
 	}
-//ファイルを検索するためのクラス(未完！！！)
+//ファイルを検索するためのクラス
 	public static class MyFilter implements FilenameFilter{
 		public boolean accept(File dir,String name){
+
 			int index = name.lastIndexOf(".");
 
 			//"."以下の文字列を取り出して小文字にする
