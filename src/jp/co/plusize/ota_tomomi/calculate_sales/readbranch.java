@@ -7,8 +7,12 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 
@@ -200,17 +204,17 @@ public class readbranch {
 				rcdbr.close();
 			}
 			catch(IOException e){
-				System.out.println("予期せぬエラーが発生しました1");
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 
 			}
 			catch(IndexOutOfBoundsException e){
-				System.out.println("予期せぬエラーが発生しました2");
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 
 			}
 			catch(NullPointerException e){
-				System.out.println("予期せぬエラーが発生しました3");
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 
 			}
@@ -236,9 +240,23 @@ public class readbranch {
 			FileWriter fwb = new FileWriter(branchfile);
 			BufferedWriter bwb = new BufferedWriter(fwb);
 
+			//降順のソートの作成
+			List<Map.Entry<String,Long>> branchentries = new ArrayList<Map.Entry<String,Long>>(branchrevenuemap.entrySet());
+			Collections.sort(branchentries, new Comparator<Map.Entry<String,Long>>() {
 
-			for(Map.Entry<String,String> e : branchmap.entrySet()){
-				bwb.write(e.getKey() + "," + e.getValue() + "," + branchrevenuemap.get(e.getKey()) + "\r\n");
+	            public int compare(
+	                  Entry<String,Long> entry1, Entry<String,Long> entry2) {
+	                return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
+	            }
+	        });
+
+
+
+
+
+			//branch.outへの出力
+			for(Map.Entry<String,Long> e :branchentries){
+				bwb.write(e.getKey() + "," + branchmap.get(e.getKey()) + "," + e.getValue() + "\r\n");
 
 
 			}
@@ -260,8 +278,22 @@ public class readbranch {
 			BufferedWriter bwc = new BufferedWriter(fwc);
 
 
-			for(Map.Entry<String,String> e : commoditymap.entrySet()){
-				bwc.write(e.getKey() + "," + e.getValue() + "," + commodityrevenuemap.get(e.getKey()) + "\r\n");
+
+
+			//降順のソートの作成
+			List<Map.Entry<String,Long>> commodityentries = new ArrayList<Map.Entry<String,Long>>(commodityrevenuemap.entrySet());
+			Collections.sort(commodityentries, new Comparator<Map.Entry<String,Long>>() {
+
+	            public int compare(
+	                  Entry<String,Long> entry1, Entry<String,Long> entry2) {
+	                return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
+	            }
+	        });
+
+
+			//commodity.outへの出力
+			for(Map.Entry<String,Long> e : commodityentries){
+				bwc.write(e.getKey() + "," + commoditymap.get(e.getKey()) + "," + e.getValue() + "\r\n");
 
 
 			}
