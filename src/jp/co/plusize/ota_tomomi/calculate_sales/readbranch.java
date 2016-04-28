@@ -38,9 +38,6 @@ public class readbranch {
 
 		ArrayList<String> revenueList = new ArrayList<String>();
 		ArrayList<Integer> fileList = new ArrayList<Integer>();
-		//ArrayList<File> directoryorfileList = new ArrayList<>();
-
-
 
 		//支店定義ファイルの読み込み
 		try{
@@ -104,10 +101,8 @@ public class readbranch {
 				    	//商品コードをキーとして商品名をマップリストに追加
 						commoditymap.put(cols[0],cols[1]);//商品名のマップ
 						commodityrevenuemap.put(cols[0],new Long(0));//商品別売上金額のマップ
-
-
-
 						}
+
 				    //商品名に改行が含まれたときの例外処理
 					catch(ArrayIndexOutOfBoundsException e){
 						System.out.println("商品定義ファイルのフォーマットが不正です");
@@ -115,7 +110,6 @@ public class readbranch {
 
 						}
 				    }
-
 
 			brc.close();
 		}
@@ -132,24 +126,17 @@ public class readbranch {
 
 		//連番かどうか
 		for(int i = 0; i < files.length; i++){
-			//System.out.println(files[i]);
 
 			File a = new File(args[0] + File.separator + files[i]);
 
 			if(a.isFile()){
 				int index = files[i].lastIndexOf(".");
 				fileList.add(Integer.parseInt(files[i].substring(0,index)));
-				//System.out.println(fileList.get(i));
-
 
 			}
 			else{
 				files[i] = null;
 			}
-
-
-
-
 		}
 
 		int max = fileList.get(0);
@@ -170,7 +157,6 @@ public class readbranch {
 
 
 		for(int i = 0; i < files.length; i++){
-			//   System.out.println(files[i]);
 
 			//売上ファイル読み込み
 			try{
@@ -178,13 +164,8 @@ public class readbranch {
 				FileReader rcdfr = new FileReader(rcdfile);
 				BufferedReader rcdbr = new BufferedReader(rcdfr);
 				String rcds;
-
-
 				while((rcds = rcdbr.readLine()) != null){
 					revenueList.add(rcds);
-
-
-
 				}
 				if(revenueList.size() != 3){
 					System.out.println(files[i] +"のフォーマットが不正です");
@@ -199,54 +180,35 @@ public class readbranch {
 					System.out.println(files[i] +"の商品コードが不正です");
 					return;
 				}
-
-
 				//売上ファイルデータ集計
 				//支店別
 				branchrevenuemap.put(revenueList.get(0),branchrevenuemap.get(revenueList.get(0)) + Long.parseLong(revenueList.get(2)));
 				commodityrevenuemap.put(revenueList.get(1),commodityrevenuemap.get(revenueList.get(1)) + Long.parseLong(revenueList.get(2)));
-
-
 				//10桁を超えたらエラーを返す
-				if(String.valueOf(branchrevenuemap.get(revenueList.get(0))).length() > 10 || String.valueOf(commodityrevenuemap.get(revenueList.get(0))).length() > 10 ){
+				if(String.valueOf(branchrevenuemap.get(revenueList.get(0))).length() > 10 || String.valueOf(commodityrevenuemap.get(revenueList.get(1))).length() > 10 ){
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
-
-
-
-
 				revenueList.clear();
 				rcdbr.close();
 			}
 			catch(IOException e){
 				System.out.println("予期せぬエラーが発生しました");
 				return;
-
 			}
 			catch(IndexOutOfBoundsException e){
 				System.out.println("予期せぬエラーが発生しました");
 				return;
-
 			}
 			catch(NullPointerException e){
 				System.out.println("予期せぬエラーが発生しました");
 				return;
-
 			}
-
-
-
 			//long型に格納できない桁数だったときのエラー
 			catch(NumberFormatException e){
 				System.out.println("合計金額が10桁を超えました");
 				return;
-
 			}
-
-
-
-
 		}
 		//支店別集計ファイルの作成
 		try{
@@ -266,15 +228,9 @@ public class readbranch {
 	            }
 	        });
 
-
-
-
-
 			//branch.outへの出力
 			for(Map.Entry<String,Long> e :branchentries){
 				bwb.write(e.getKey() + "," + branchmap.get(e.getKey()) + "," + e.getValue() + "\r\n");
-
-
 			}
 
 			bwb.close();
@@ -293,9 +249,6 @@ public class readbranch {
 			FileWriter fwc = new FileWriter(commodityfile);
 			BufferedWriter bwc = new BufferedWriter(fwc);
 
-
-
-
 			//降順のソートの作成
 			List<Map.Entry<String,Long>> commodityentries = new ArrayList<Map.Entry<String,Long>>(commodityrevenuemap.entrySet());
 			Collections.sort(commodityentries, new Comparator<Map.Entry<String,Long>>() {
@@ -306,11 +259,9 @@ public class readbranch {
 	            }
 	        });
 
-
 			//commodity.outへの出力
 			for(Map.Entry<String,Long> e : commodityentries){
 				bwc.write(e.getKey() + "," + commoditymap.get(e.getKey()) + "," + e.getValue() + "\r\n");
-
 
 			}
 
@@ -319,10 +270,7 @@ public class readbranch {
 		catch(IOException e){
 			System.out.println("予期せぬエラーが発生しました");
 			return;
-
 		}
-
-
 }
 
 //半角数値以外のときtrue
@@ -354,17 +302,3 @@ public class readbranch {
 	}
 }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
