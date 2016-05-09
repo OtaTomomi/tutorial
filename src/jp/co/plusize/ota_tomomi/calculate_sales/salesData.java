@@ -22,75 +22,25 @@ public class salesData{
 			return;
 		}
 		//支店コードをキーとして支店名を参照するマップリストの定義
-		HashMap<String,String> branchmap = new HashMap<String,String>();
+		HashMap<String,String> branchMap = new HashMap<String,String>();
 		//商品コードをキーとして商品名を参照するマップリストの定義
-		HashMap<String,String> commoditymap = new HashMap<String,String>();
+		HashMap<String,String> commodityMap = new HashMap<String,String>();
 		//支店コードをキーとして支店別の売上金額を参照するマップリストの定義
-		HashMap<String,Long> branchrevenuemap = new HashMap<String,Long>();
+		HashMap<String,Long> branchSaleMap = new HashMap<String,Long>();
 		//商品コードをキーとして商品別の売上金額を参照するマップリストの定義
-		HashMap<String,Long> commodityrevenuemap = new HashMap<String,Long>();
+		HashMap<String,Long> commoditySaleMap = new HashMap<String,Long>();
 		//読み込んだ売上ファイルの情報を一時的に格納するためのリストの定義
-		ArrayList<String> revenueList = new ArrayList<String>();
+		ArrayList<String> saleList = new ArrayList<String>();
 		//リストアップした売上ファイルの名前を数値化したものを格納するためのデータ
 		ArrayList<Integer> fileList = new ArrayList<Integer>();
+
+		BufferedReader br = null;
 		//支店定義ファイルの読み込み
-		try{
-			File file = new File(args[0], "branch.lst");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String data;
-				while((data = br.readLine()) != null){
-					String[] cols = data.split(",");     //カンマによる文字列の分割
-					try{
-						//支店定義ファイルのフォーマットが正しいかどうか判定（桁数、カンマの有無、半角数値）
-						if(cols[0].length() != 3 || cols.length > 2 || isNumber(cols[0])){
-							System.out.println("支店定義ファイルのフォーマットが不正です");
-							return;
-						}
-						//支店コードをキーとして支店名をマップリストに追加
-						branchmap.put(cols[0],cols[1]);//支店名のマップ
-						branchrevenuemap.put(cols[0],new Long(0));//支店別売上金額のマップ
-					}
-					//支店名に改行が含まれたときの例外処理
-					catch(ArrayIndexOutOfBoundsException e){
-						System.out.println("支店定義ファイルのフォーマットが不正です");
-						return;
-						}
-				}
-				br.close();
-			}
-		catch(IOException e){
-			System.out.println("支店定義ファイルが存在しません");
+		if(readData(args[0] + File.separator +"branch.lst",branchSaleMap,branchMap) == false){
 			return;
 		}
 		//商品定義ファイルの読み込み
-		try{
-			File file = new File(args[0] , "commodity.lst");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String data;
-			while((data = br.readLine()) != null){
-				String[] cols = data.split(",");     //カンマによる文字列の分割
-				    try{
-				    	//商品定義ファイルのフォーマットが正しいかどうか判定（桁数、カンマの有無、半角英数値）
-						if(cols[0].length() != 8|| cols.length > 2 || isAlphabet(cols[0])){
-							System.out.println("商品定義ファイルのフォーマットが不正です");
-							return;
-						}
-				    	//商品コードをキーとして商品名をマップリストに追加
-						commoditymap.put(cols[0],cols[1]);//商品名のマップ
-						commodityrevenuemap.put(cols[0],new Long(0));//商品別売上金額のマップ
-						}
-				    //商品名に改行が含まれたときの例外処理
-					catch(ArrayIndexOutOfBoundsException e){
-						System.out.println("商品定義ファイルのフォーマットが不正です");
-						return;
-						}
-				    }
-			br.close();
-		}
-		catch(IOException e){
-			System.out.println("商品定義ファイルが存在しません");
+		if(readData(args[0] + File.separator +"commodity.lst",commoditySaleMap,commodityMap) == false){
 			return;
 		}
 		//売上ファイルの検索
@@ -126,112 +76,80 @@ public class salesData{
 			try{
 				File file = new File(args[0] + File.separator + files[i]);
 				FileReader fr = new FileReader(file);
-				BufferedReader br = new BufferedReader(fr);
+				br = new BufferedReader(fr);
 				String data;
 				while((data = br.readLine()) != null){
-					revenueList.add(data);
+					saleList.add(data);
 				}
-				if(revenueList.size() != 3){
+				if(saleList.size() != 3){
 					System.out.println(files[i] +"のフォーマットが不正です");
 					return;
 				}
-				if(branchrevenuemap.containsKey(revenueList.get(0)) == false){
+				if(branchSaleMap.containsKey(saleList.get(0)) == false){
 					System.out.println(files[i] +"の支店コードが不正です");
 					return;
 				}
-				if(commodityrevenuemap.containsKey(revenueList.get(1)) == false){
+				if(commoditySaleMap.containsKey(saleList.get(1)) == false){
 					System.out.println(files[i] +"の商品コードが不正です");
 					return;
 				}
-				//売上ファイルデータ集計
-				//支店別
-				branchrevenuemap.put(revenueList.get(0),branchrevenuemap.get(revenueList.get(0)) + Long.parseLong(revenueList.get(2)));
-				//商品別
-				commodityrevenuemap.put(revenueList.get(1),commodityrevenuemap.get(revenueList.get(1)) + Long.parseLong(revenueList.get(2)));
-				//10桁を超えたらエラーを返す
-				if(String.valueOf(branchrevenuemap.get(revenueList.get(0))).length() > 10 || String.valueOf(commodityrevenuemap.get(revenueList.get(1))).length() > 10 ){
-					System.out.println("合計金額が10桁を超えました");
+				//支店別集計
+				if(makeSaleList(saleList,branchSaleMap) == false){
 					return;
 				}
-				revenueList.clear();
-				br.close();
+				//商品別集計
+				if(makeSaleList(saleList,commoditySaleMap) == false){
+					return;
+				}
+				saleList.clear();
 			}
 			catch(IOException e){
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました1");
 				return;
 			}
 			catch(IndexOutOfBoundsException e){
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました2");
 				return;
 			}
 			catch(NullPointerException e){
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました3");
 				return;
 			}
 			//long型に格納できない桁数だったときのエラー
 			catch(NumberFormatException e){
-				System.out.println("合計金額が10桁を超えました");
+				System.out.println("合計金額が10桁を超えました4");
 				return;
+			}
+			finally{
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.out.println("予期せぬエラーが発生しました5");
+					return;
+				}
 			}
 		}
 		//支店別集計ファイルの作成
-		try{
-			File file = new File(args[0],"branch.out");
-			file.createNewFile();
-			FileWriter fw = new FileWriter(file);
-			BufferedWriter bw = new BufferedWriter(fw);
-			//降順のソートの作成
-			List<Map.Entry<String,Long>> branchentries = new ArrayList<Map.Entry<String,Long>>(branchrevenuemap.entrySet());
-			Collections.sort(branchentries, new Comparator<Map.Entry<String,Long>>() {
-				public int compare(
-						Entry<String,Long> entry1, Entry<String,Long> entry2) {
-					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
-					}
-				});
-			//branch.outへの出力
-			for(Map.Entry<String,Long> e :branchentries){
-				bw.write(e.getKey() + "," + branchmap.get(e.getKey()) + "," + e.getValue() + "\r\n");
-			}
-			bw.close();
-		}
-		catch(IOException e){
+		if(makeSaleData(args[0] + File.separator +"branch.out",branchSaleMap,branchMap) == false){
 			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
 		//商品別集計ファイルの作成
-		try{
-			File file = new File(args[0],"commodity.out");
-			file.createNewFile();
-			FileWriter fw = new FileWriter(file);
-			BufferedWriter bw = new BufferedWriter(fw);
-			//降順のソートの作成
-			List<Map.Entry<String,Long>> commodityentries = new ArrayList<Map.Entry<String,Long>>(commodityrevenuemap.entrySet());
-			Collections.sort(commodityentries, new Comparator<Map.Entry<String,Long>>() {
-				public int compare(
-						Entry<String,Long> entry1, Entry<String,Long> entry2) {
-					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
-					}
-				});
-			//commodity.outへの出力
-			for(Map.Entry<String,Long> e : commodityentries){
-				bw.write(e.getKey() + "," + commoditymap.get(e.getKey()) + "," + e.getValue() + "\r\n");
-			}
-			bw.close();
-		}
-		catch(IOException e){
+		if(makeSaleData(args[0] + File.separator +"commodity.out",commoditySaleMap,commodityMap) == false){
 			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
 	}
-//半角数値以外のときtrue
-	public static boolean isNumber(String s) {
-		return Pattern.compile("\\D").matcher(s).find();
+	//半角数値以外のときtrue
+	public static boolean isNumber(String fileName) {
+		return Pattern.compile("\\D").matcher(fileName).find();
 	}
-//半角英数値以外のときtrue
-	public static boolean isAlphabet(String s) {
-		return Pattern.compile("\\W").matcher(s).find();
+	//半角英数値以外のときtrue
+	public static boolean isAlphabet(String fileName) {
+		return Pattern.compile("\\W").matcher(fileName).find();
 	}
-//ファイルを検索するためのクラス
+	//ファイルを検索するためのクラス
 	public static class fileListFilter implements FilenameFilter{
 		public boolean accept(File dir,String name){
 			int index = name.lastIndexOf(".");
@@ -245,6 +163,108 @@ public class salesData{
 				}
 			return false;
 		}
-
+	}
+	//売上集計ファイル作成のためのメソッド
+	public static boolean makeSaleData(String fileName,HashMap<String,Long> saleMap,HashMap<String,String> codeMap){
+		try{
+			File file = new File(fileName);
+			file.createNewFile();
+			FileWriter fw = new FileWriter(file);
+			BufferedWriter bw = new BufferedWriter(fw);
+			//降順のソートの作成
+			List<Map.Entry<String,Long>> entries = new ArrayList<Map.Entry<String,Long>>(saleMap.entrySet());
+			Collections.sort(entries, new Comparator<Map.Entry<String,Long>>() {
+			public int compare(
+						Entry<String,Long> entry1, Entry<String,Long> entry2) {
+					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
+					}
+				});
+			//branch.outへの出力
+			for(Map.Entry<String,Long> e :entries){
+				bw.write(e.getKey() + "," + codeMap.get(e.getKey()) + "," + e.getValue() + "\r\n");
+			}
+			bw.close();
+			return true;
+		}
+		catch(IOException e){
+			return false;
+		}
+	}
+	//定義ファイル読み込みのためのメソッド
+	public static boolean readData(String fileName,HashMap<String,Long> saleMap,HashMap<String,String> codeMap){
+		BufferedReader br = null;
+		try{
+			File file = new File(fileName);
+			FileReader fr = new FileReader(file);
+			br = new BufferedReader(fr);
+			String data;
+			while((data = br.readLine()) != null){
+				String[] cols = data.split(",");     //カンマによる文字列の分割
+				try{
+					if(fileName.indexOf("branch") != -1){
+						//支店定義ファイルのフォーマットが正しいかどうか判定（桁数、カンマの有無、半角数値）
+						if(cols[0].length() != 3 || cols.length > 2 || isNumber(cols[0])){
+							System.out.println("支店定義ファイルのフォーマットが不正です");
+							br.close();
+							return false;
+						}
+					}
+					if(fileName.indexOf("commodity") != -1){
+						if(cols[0].length() != 8|| cols.length > 2 || isAlphabet(cols[0])){
+							System.out.println("商品定義ファイルのフォーマットが不正です");
+							br.close();
+							return false;
+						}
+					}
+					//支店・商品コードをキーとして支店・商品名をマップリストに追加
+					codeMap.put(cols[0],cols[1]);//支店・商品名のマップ
+					//支店・商品コードをキーとして支店・商品ごとの売上金額を格納するマップリストを作成
+					saleMap.put(cols[0],new Long(0));//支店・商品別売上金額のマップ
+					}
+					catch(ArrayIndexOutOfBoundsException e){
+						//支店名に改行が含まれたときの例外処理
+						if(fileName.indexOf("branch") != -1){
+							System.out.println("支店定義ファイルのフォーマットが不正です");
+							br.close();
+							return false;
+						}
+						//商品名に改行が含まれたときの例外処理
+						if(fileName.indexOf("commodity") != -1){
+							System.out.println("商品定義ファイルのフォーマットが不正です");
+							br.close();
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+		catch(IOException e){
+			if(fileName.indexOf("branch") != -1){
+				System.out.println("支店定義ファイルが存在しません");
+			}
+			if(fileName.indexOf("commodity") != -1){
+				System.out.println("商品定義ファイルが存在しません");
+			}
+			return false;
+		}
+		finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				System.out.println("予期せぬエラーが発生しました");
+				e.printStackTrace();
+				return false;
+			}
+		}
+	}
+	//売上額を集計するメソッド（うまくいってなさそう）
+	public static boolean makeSaleList(ArrayList<String> list,HashMap<String,Long> saleMap){
+		saleMap.put(list.get(0),saleMap.get(list.get(0)) + Long.parseLong(list.get(2)));
+		//10桁を超えたらエラーを返す
+		if(String.valueOf(saleMap.get(list.get(0))).length() > 10){
+			System.out.println("合計金額が10桁を超えました");
+			return false;
+		}
+		return true;
 	}
 }
