@@ -238,7 +238,7 @@ public class salesData{
 	public static boolean makeSaleList(ArrayList<String> list,HashMap<String,Long> saleMap,int codeLine){
 		saleMap.put(list.get(codeLine - 1),saleMap.get(list.get(codeLine - 1)) + Long.parseLong(list.get(2)));
 		//10桁を超えたらエラーを返す
-		if(String.valueOf(saleMap.get(list.get(0))).length() > 10){
+		if(String.valueOf(saleMap.get(list.get(codeLine - 1))).length() > 10){
 			System.out.println("合計金額が10桁を超えました");
 			return false;
 		}
