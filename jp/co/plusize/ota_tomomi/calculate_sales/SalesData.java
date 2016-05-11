@@ -177,8 +177,8 @@ public class SalesData{
 					}
 				});
 			//出力
-			for(Map.Entry<String,Long> outputEntries :entries){
-				bw.write(outputEntries.getKey() + "," + codeMap.get(outputEntries.getKey()) + "," + outputEntries.getValue());
+			for(Map.Entry<String,Long> outputEntry :entries){
+				bw.write(outputEntry.getKey() + "," + codeMap.get(outputEntry.getKey()) + "," + outputEntry.getValue());
 				bw.newLine();
 			}
 			return true;
