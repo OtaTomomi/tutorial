@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-public class salesData{
+public class SalesData{
 	public static void main (String[] args){
 		//コマンドライン引数が渡されていなかったとき、2つ以上あるときの処理
 		if(args.length != 1 ){
@@ -73,11 +73,7 @@ public class salesData{
 			if(fileOrDirectry.isFile()){
 				int index = files[i].lastIndexOf(".");
 				fileList.add(Integer.parseInt(files[i].substring(0,index)));
-			//なくしたらエラーが出ました
 			}
-			//else{
-				//files[i] = null;
-			//}
 		}
 		int max = fileList.get(0);
 		int min = fileList.get(0);
@@ -191,7 +187,6 @@ public class salesData{
 				bw.write(e.getKey() + "," + codeMap.get(e.getKey()) + "," + e.getValue());
 				bw.newLine();
 			}
-
 			return true;
 		}catch(IOException e){
 			return false;
