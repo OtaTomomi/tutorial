@@ -77,6 +77,7 @@ public class salesData{
 			}else{
 				files[i] = null;
 			}
+			//System.out.println(files[i]);
 		}
 		int max = fileList.get(0);
 		int min = fileList.get(0);
@@ -159,13 +160,11 @@ public class salesData{
 	//ファイルを検索するためのクラス
 	public static class fileListFilter implements FilenameFilter{
 		public boolean accept(File dir, String name){
-			int index = name.lastIndexOf(".");
-			//"."以下の文字列を取り出して小文字にする
-			String ext = name.substring(index + 1).toLowerCase();
-			//"."以前の文字列を取り出す
-			String fileName = name.substring(0, index);
-			//拡張子がrcdかつファイル名が8桁
-			if(ext.equals("rcd") == true && fileName.length() == 8){
+			String[] cols = name.split("\\.");
+			if(cols.length != 2){
+				return false;
+			}
+			if(cols[1].equals("rcd") && cols[0].length() == 8){
 				return true;
 				}
 			return false;
