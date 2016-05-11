@@ -74,10 +74,10 @@ public class salesData{
 				int index = files[i].lastIndexOf(".");
 				fileList.add(Integer.parseInt(files[i].substring(0,index)));
 			//なくしたらエラーが出ました
-			}else{
-				files[i] = null;
 			}
-			//System.out.println(files[i]);
+			//else{
+				//files[i] = null;
+			//}
 		}
 		int max = fileList.get(0);
 		int min = fileList.get(0);
