@@ -16,9 +16,8 @@ import java.util.Map.Entry;
 public class SalesData{
 	public static void main (String[] args){
 		//コマンドライン引数が渡されていなかったとき、2つ以上あるときの処理
-		if(args.length != 1 ){
+		if(args.length != 1){
 			System.out.println("予期せぬエラーが発生しました");
-
 			return;
 		}
 		//支店コードをキーとして支店名を参照するマップリストの定義
@@ -46,8 +45,8 @@ public class SalesData{
 			return;
 		}
 		//支店定義ファイルの読み込み
-		String branchRead = readData(args[0] + File.separator + "branch.lst", branchSaleMap,branchMap, "^\\d{3}$");
-		String commodityRead = readData(args[0] + File.separator + "commodity.lst", commoditySaleMap,commodityMap, "^\\w{8}$");
+		String branchRead = readData(args[0] + File.separator + "branch.lst", branchSaleMap, branchMap, "^\\d{3}$");
+		String commodityRead = readData(args[0] + File.separator + "commodity.lst", commoditySaleMap, commodityMap, "^\\w{8}$");
 		if(branchRead != "" ){
 			if(branchRead.equals("予期せぬエラーが発生しました")){
 				System.out.println(branchRead);
@@ -72,8 +71,7 @@ public class SalesData{
 		for(int i = 0; i < files.length; i++){
 			File fileOrDirectry = new File(args[0] + File.separator + files[i]);
 			if(fileOrDirectry.isFile()){
-				int index = files[i].lastIndexOf(".");
-				fileList.add(Integer.parseInt(files[i].substring(0,index)));
+				fileList.add(Integer.parseInt(files[i].substring(0, 8)));
 			}
 		}
 		int max = fileList.get(0);
@@ -121,22 +119,24 @@ public class SalesData{
 					return;
 				}
 				saleList.clear();
-			} catch(IOException e){
+			} catch(IOException e) {
 				System.out.println("予期せぬエラーが発生しました");
 				return;
-			} catch(IndexOutOfBoundsException e){
+			} catch(IndexOutOfBoundsException e) {
 				System.out.println("予期せぬエラーが発生しました");
 				return;
-			} catch(NullPointerException e){
+			} catch(NullPointerException e) {
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			//long型に格納できない桁数だったときのエラー
-			}catch(NumberFormatException e){
+			} catch(NumberFormatException e) {
 				System.out.println("合計金額が10桁を超えました");
 				return;
-			}finally{
+			} finally {
 				try {
-					br.close();
+					if(br != null){
+						br.close();
+					}
 				} catch (IOException e) {
 					System.out.println("予期せぬエラーが発生しました");
 					return;
@@ -189,20 +189,20 @@ public class SalesData{
 				bw.newLine();
 			}
 			return true;
-		}catch(IOException e){
+		} catch(IOException e) {
 			return false;
-		}finally{
+		} finally {
 			try {
-				bw.close();
+				if(bw != null){
+					bw.close();
+				}
 			} catch (IOException e) {
-				return false;
-			}catch (NullPointerException e) {
 				return false;
 			}
 		}
 	}
 	//定義ファイル読み込みのためのメソッド
-	public static String readData(String fileName, HashMap<String,Long> saleMap,HashMap<String,String> codeMap, String codeTerm){
+	public static String readData(String fileName, HashMap<String,Long> saleMap, HashMap<String,String> codeMap, String codeTerm){
 		BufferedReader br = null;
 		try{
 			File file = new File(fileName);
@@ -220,14 +220,14 @@ public class SalesData{
 				saleMap.put(cols[0], new Long(0));//支店・商品別売上金額のマップ
 			}
 			return "";
-		}
-		catch(IOException e){
+		} catch(IOException e) {
 			return "予期せぬエラーが発生しました";
-		}
-		finally{
+		} finally {
 			try {
-				br.close();
-			} catch (IOException e){
+				if(br != null){
+					br.close();
+				}
+			} catch (IOException e) {
 				return "予期せぬエラーが発生しました";
 			}
 		}
