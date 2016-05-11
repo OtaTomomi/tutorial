@@ -200,6 +200,8 @@ public class salesData{
 				bw.close();
 			} catch (IOException e) {
 				return false;
+			}catch (NullPointerException e) {
+				return false;
 			}
 		}
 	}
