@@ -36,9 +36,12 @@
 	<input name = "name" value = "${ newUser.name }" id = "name" /><br />
 
 	支店名
+
 	<select name = "branchId" >
 		<c:forEach items = "${ branches }" var = "branch" >
-			<option value = "${ branch.id }"><c:out value = "${ branch.name }"  />
+			<option value = "${ branch.id }"
+				<c:if test = "${ branch.id == newUser.branchId }"> selected</c:if>>
+			<c:out value = "${ branch.name }"  />
 			</option>
 		</c:forEach>
 	</select>
@@ -46,11 +49,15 @@
 	部署・役職名
 	<select name = "positionId" >
 		<c:forEach items = "${ positions }" var = "position" >
-			<option value = "${ position.id }"><c:out value = "${ position.name }"  />
+			<option value = "${ position.id }"
+					<c:if test = "${ position.id == newUser.positionId }">
+					selected </c:if>>
+				 <c:out value = "${ position.name }"  />
 			</option>
 		</c:forEach>
 	</select>
 	<input type = "submit" value = "登録" /><br />
+	<c:remove var = "newUser" scope = "session" />
 	<a href = "usercontroll">戻る</a>
 </form>
 

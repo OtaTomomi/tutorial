@@ -227,10 +227,7 @@ public class UserDao {
 		PreparedStatement ps = null;
 		try{
 			StringBuilder sql = new StringBuilder();
-			String password = user.getPassword();
 
-
-			if(password.equals(null)){
 				sql.append("UPDATE users SET");
 				sql.append(" login_id = ?");
 				sql.append(", password = ?");
@@ -249,25 +246,8 @@ public class UserDao {
 				ps.setInt(4, user.getBranchId());
 				ps.setInt(5, user.getPositionId());
 				ps.setInt(6, user.getId());
-			} else {
-				sql.append("UPDATE users SET");
-				sql.append(" login_id = ?");
-				sql.append(", name = ?");
-				sql.append(", branch_id = ?");
-				sql.append(", position_id = ?");
-				sql.append(", update_date = CURRENT_TIMESTAMP");
-				sql.append(" WHERE");
-				sql.append(" id = ?;");
 
-				ps = connection.prepareStatement(sql.toString());
 
-				ps.setString(1, user.getLoginId());
-				ps.setString(2, user.getName());
-				ps.setInt(3, user.getBranchId());
-				ps.setInt(4, user.getPositionId());
-				ps.setInt(5, user.getId());
-
-			}
 			int count = ps.executeUpdate();
 			if (count == 0){
 				throw new NoRowsUpdatedRuntimeException();
@@ -300,6 +280,44 @@ public class UserDao {
 			close(ps);
 		}
 	}
+	public void updateUserNoPassword(Connection connection,User user){
+
+		PreparedStatement ps = null;
+		try{
+			StringBuilder sql = new StringBuilder();
+
+			sql.append("UPDATE users SET");
+			sql.append(" login_id = ?");
+			sql.append(", name = ?");
+			sql.append(", branch_id = ?");
+			sql.append(", position_id = ?");
+			sql.append(", update_date = CURRENT_TIMESTAMP");
+			sql.append(" WHERE");
+			sql.append(" id = ?;");
+
+			ps = connection.prepareStatement(sql.toString());
+
+			ps.setString(1, user.getLoginId());
+			ps.setString(2, user.getName());
+			ps.setInt(3, user.getBranchId());
+			ps.setInt(4, user.getPositionId());
+			ps.setInt(5, user.getId());
+
+
+			int count = ps.executeUpdate();
+			if (count == 0){
+				throw new NoRowsUpdatedRuntimeException();
+		}
+		} catch (SQLException e) {
+			throw new SQLRuntimeException(e);
+		} finally {
+			close(ps);
+		}
+	}
+
+
 
 }
+
+
 

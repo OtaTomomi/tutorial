@@ -106,7 +106,7 @@ public class MessageService {
 						beginDate,endDate);
 
 
-				commit(connection);
+				//commit(connection);
 
 				return ret;
 			}catch (RuntimeException e){

@@ -78,6 +78,7 @@ public class MessageSearchServlet extends HttpServlet{
 
 		String reset = request.getParameter("reset");
 		if (reset != null){
+
 			response.sendRedirect("home");
 		}
 	}

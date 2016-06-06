@@ -110,15 +110,34 @@ public class UserService {
 		try{
 			connection = getConnection();
 
-			if(!user.getPassword().equals(null)){
 
-				String encPassword = CipherUtil.encrypt(user.getPassword());
-				user.setPassword(encPassword);
+			String encPassword = CipherUtil.encrypt(user.getPassword());
+			user.setPassword(encPassword);
 
-			}
 
 			UserDao userDao = new UserDao();
 			userDao.updateUser(connection, user);
+
+			commit(connection);
+		} catch (RuntimeException e) {
+			rollback(connection);
+			throw e;
+		} catch (Error e){
+			rollback(connection);
+			throw e;
+		} finally {
+			close(connection);
+		}
+	}
+	public void updateUserNoPassword(User user){
+
+		Connection connection = null;
+		try{
+			connection = getConnection();
+
+
+			UserDao userDao = new UserDao();
+			userDao.updateUserNoPassword(connection, user);
 
 			commit(connection);
 		} catch (RuntimeException e) {

@@ -37,20 +37,22 @@ public class PostingServlet extends HttpServlet{
 		HttpSession session = request.getSession();
 		List<String> messages = new ArrayList<String>();
 
+		User user = (User) session.getAttribute("loginUser");
+
+		Message message = new Message();
+		message.setSubject(request.getParameter("subject"));
+		message.setText(request.getParameter("text"));
+		message.setCategory(request.getParameter("category"));
+		message.setUserId(user.getId());
+
+
 		if(isValid(request, messages) == true){
-
-			User user = (User) session.getAttribute("loginUser");
-
-			Message message = new Message();
-			message.setSubject(request.getParameter("subject"));
-			message.setText(request.getParameter("text"));
-			message.setCategory(request.getParameter("category"));
-			message.setUserId(user.getId());
 
 			new MessageService().register(message);
 
 			response.sendRedirect("home");
 		} else {
+			session.setAttribute("message",message);
 			session.setAttribute("errorMessages", messages);
 			response.sendRedirect("posting");
 		}
@@ -70,13 +72,13 @@ public class PostingServlet extends HttpServlet{
 			messages.add("50字以下で入力してください");
 		}
 		if(StringUtils.isBlank(text) == true){
-			messages.add("メッセージを入力してください");
+			messages.add("本文を入力してください");
 		}
 		if(10000 < text.length()){
 			messages.add("10000字以下で入力してください");
 		}
 		if(StringUtils.isBlank(category) == true){
-			messages.add("メッセージを入力してください");
+			messages.add("カテゴリーを入力してください");
 		}
 		if(10 < category.length()){
 			messages.add("10字以下で入力してください");

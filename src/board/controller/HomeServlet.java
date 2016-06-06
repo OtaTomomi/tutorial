@@ -31,6 +31,8 @@ public class HomeServlet extends HttpServlet{
 			HttpServletResponse response) throws IOException,
 	ServletException{
 
+		List<UserComment> userComments = new CommentService().getComment();
+
 		ArrayList<Integer> years = new ArrayList<Integer>();
 		for(int i = 2000 ; i < 2020 ; i ++){
 			years.add(new Integer(i));
@@ -44,16 +46,57 @@ public class HomeServlet extends HttpServlet{
 			days.add(new Integer(i));
 		}
 
-		request.setAttribute("years", years);
-		request.setAttribute("months", months);
-		request.setAttribute("days", days);
-		List<UserMessage> userMessages = new MessageService().getMessage();
-		List<User> users = new UserService().getUser();
-		request.setAttribute("userMessages", userMessages);
-		request.setAttribute("users", users);
-		List<UserComment> userComments = new CommentService().getComment();
-		request.setAttribute("userComments", userComments);
-		request.getRequestDispatcher("home.jsp").forward(request, response);
+		if (request.getParameter("search") != null){
+
+			//検索値受け取り処理
+			int beginYear = Integer.parseInt(request.getParameter("beginYear"));
+			int beginMonth = Integer.parseInt(request.getParameter("beginMonth"));
+			int beginDay = Integer.parseInt(request.getParameter("beginDay"));
+			int endYear = Integer.parseInt(request.getParameter("endYear"));
+			int endMonth = Integer.parseInt(request.getParameter("endMonth"));
+			int endDay = Integer.parseInt(request.getParameter("endDay"));
+			String category = request.getParameter("category");
+
+			if(StringUtils.isBlank(category) == true){
+				System.out.println("実行A");
+
+				List<UserMessage> userMessageMatchDateOnly = new MessageService().getMessageMatchDateOnly(beginYear, beginMonth, beginDay, endYear, endMonth, endDay);
+				System.out.println(userMessageMatchDateOnly.size());
+				request.setAttribute("userMessages", userMessageMatchDateOnly);
+				request.setAttribute("userComments", userComments);
+				request.setAttribute("years", years);
+				request.setAttribute("months", months);
+				request.setAttribute("days", days);
+				request.getRequestDispatcher("home.jsp").forward(request, response);
+
+			}else{
+				System.out.println("実行B");
+
+				List<UserMessage> userMessageMatchDateAndCategories = new MessageService().getMessageMatchDateAndCategory(category,beginYear, beginMonth, beginDay, endYear, endMonth, endDay);
+
+				request.setAttribute("userMessages", userMessageMatchDateAndCategories);
+				request.setAttribute("userComments", userComments);
+				request.setAttribute("years", years);
+				request.setAttribute("months", months);
+				request.setAttribute("days", days);
+				request.getRequestDispatcher("home.jsp").forward(request, response);
+
+			}
+
+		} else {
+			request.setAttribute("years", years);
+			request.setAttribute("months", months);
+			request.setAttribute("days", days);
+			List<UserMessage> userMessages = new MessageService().getMessage();
+			List<User> users = new UserService().getUser();
+			request.setAttribute("userMessages", userMessages);
+			request.setAttribute("users", users);
+
+			request.setAttribute("userComments", userComments);
+			request.getRequestDispatcher("home.jsp").forward(request, response);
+
+		}
+
 
 	}
 
@@ -63,33 +106,55 @@ public class HomeServlet extends HttpServlet{
 
 		HttpSession session = request.getSession();
 		List<String> messages = new ArrayList<String>();
+		String reset = request.getParameter("reset");
 
-		if(request.getParameter("deleteMessageId") != null){
-			int deleteMessageId = Integer.parseInt(request.getParameter("deleteMessageId"));
-			new MessageService().deleteMessage(deleteMessageId);
+
+		if (reset != null){
+			System.out.println("実行C");
+
 			response.sendRedirect("home");
-		} else {
-
-			if(isValid(request, messages) == true){
-
-				User user = (User) session.getAttribute("loginUser");
-
-				Comment comment = new Comment();
-				comment.setText(request.getParameter("commentText"));
-				comment.setUserId(user.getId());
-				comment.setMessageId(Integer.parseInt(request.getParameter("messageId")));
-				new CommentService().register(comment);
-
-				response.sendRedirect("home");
-			} else {
-				session.setAttribute("errorMessages", messages);
+		}  else {
+			if(request.getParameter("deleteMessageId") != null){
+				int deleteMessageId = Integer.parseInt(request.getParameter("deleteMessageId"));
+				new MessageService().deleteMessage(deleteMessageId);
 				response.sendRedirect("home");
 			}
+			if(request.getParameter("deleteCommentId") != null){
+				int deleteCommentId = Integer.parseInt(request.getParameter("deleteCommentId"));
+				new CommentService().deleteComment(deleteCommentId);
+				response.sendRedirect("home");
 
+
+
+			}else {
+
+
+				if(isValid(request, messages) == true){
+
+					User user = (User) session.getAttribute("loginUser");
+
+					Comment comment = new Comment();
+					comment.setText(request.getParameter("commentText"));
+					comment.setUserId(user.getId());
+					comment.setMessageId(Integer.parseInt(request.getParameter("messageId")));
+					new CommentService().register(comment);
+
+					response.sendRedirect("home");
+				} else {
+					session.setAttribute("errorMessages", messages);
+					response.sendRedirect("home");
+				}
+
+
+			}
 
 		}
 
-	}
+
+
+
+
+		}
 
 
 

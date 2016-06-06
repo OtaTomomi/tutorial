@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
+
 import board.beans.Branch;
 import board.beans.Position;
 import board.beans.User;
@@ -37,7 +39,22 @@ public class EditUserCheckServlet extends HttpServlet{
 		List<String> messages =  new ArrayList<String>();
 		String revision = request.getParameter("revision");
 
-		User editUser = getEditUser(request);
+		String password = request.getParameter("password");
+
+		User editUser = new User();
+		editUser.setId(Integer.parseInt(request.getParameter("id")));
+		editUser.setLoginId(request.getParameter("loginId"));
+		editUser.setName(request.getParameter("name"));
+		editUser.setBranchId(Integer.parseInt(request.getParameter("branchId")));
+		editUser.setPositionId(Integer.parseInt(request.getParameter("positionId")));
+
+		if(StringUtils.isBlank(password) || password.equals("/n")){
+			editUser.setPassword(null);
+
+		} else {
+			editUser.setPassword(password);
+		}
+
 
 		List<Branch> branches = new BranchService().getBranch();
 		List<Position> positions = new PositionService().getPosition();
@@ -51,7 +68,17 @@ public class EditUserCheckServlet extends HttpServlet{
 
 		}else{
 			try{
-				new UserService().updateUser(editUser);
+
+				if(StringUtils.isBlank(password) || password.equals("/n")){
+					new UserService().updateUserNoPassword(editUser);
+
+
+				} else {
+					new UserService().updateUser(editUser);
+				}
+
+
+
 			} catch (NoRowsUpdatedRuntimeException e) {
 
 				messages.add("他の人によって更新されています。最新のデータを表示しました。データを確認してください");
@@ -65,19 +92,6 @@ public class EditUserCheckServlet extends HttpServlet{
 		}
 
 
-		}
-
-	private User getEditUser(HttpServletRequest request)throws IOException, ServletException {
-		//HttpSession session = request.getSession();
-
-		User editUser = new User();
-		editUser.setId(Integer.parseInt(request.getParameter("id")));
-		editUser.setLoginId(request.getParameter("loginId"));
-		editUser.setPassword(request.getParameter("password"));
-		editUser.setName(request.getParameter("name"));
-		editUser.setBranchId(Integer.parseInt(request.getParameter("branchId")));
-		editUser.setPositionId(Integer.parseInt(request.getParameter("positionId")));
-		return editUser;
 	}
 }
 

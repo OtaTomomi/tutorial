@@ -55,6 +55,7 @@ public class UserMessageDao {
 			ps.setString(2, beginDate);
 			ps.setString(3, endDate);
 			ResultSet rs = ps.executeQuery();
+			System.out.println(ps);
 			List<UserMessage> ret = toUserMessageList(rs);
 			return ret;
 		} catch (SQLException e){
@@ -87,6 +88,7 @@ public class UserMessageDao {
 				ps.setString(2, endDate);
 
 				ResultSet rs = ps.executeQuery();
+				System.out.println(ps);
 
 				List<UserMessage> ret = toUserMessageList(rs);
 				return ret;

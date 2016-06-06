@@ -41,7 +41,28 @@ public class CommentDao {
 			throw new SQLRuntimeException(e);
 		} finally {
 			close(ps);
-;		}
+		}
+	}
+	public void deleteComment(Connection connection,int id){
+		PreparedStatement ps = null;
+		try{
+			StringBuilder sql = new StringBuilder();
+
+			sql.append("DELETE FROM comments");
+			sql.append(" WHERE id = ? ;");
+
+
+			ps = connection.prepareStatement(sql.toString());
+
+			ps.setInt(1, id);
+			ps.executeUpdate();
+
+
+		}catch (SQLException e) {
+			throw new SQLRuntimeException(e);
+		} finally {
+			close(ps);
+		}
 	}
 
 

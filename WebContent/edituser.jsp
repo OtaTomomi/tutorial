@@ -34,7 +34,7 @@
 		<input name = "name" value = "${ editUser.name }"  id = "name" /><br />
 
 		<label for = "password" >パスワード</label>
-		<input name = "password"  id = "password" /><br />
+		<input name = "password"  type = "password" id = "password" /><br />
 
 		<label for = "passwordCheck">パスワード(確認用)</label>
 		<input name = "passwordCheck" type = "password" id = "passwordCheck" /><br />
