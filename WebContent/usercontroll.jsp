@@ -26,7 +26,7 @@
 </div>
 	<table border = "1">
 		<tr>
-			<th>ログインID</th><th>名称</th><th>利用制限</th>
+			<th>ログインID</th><th>名称</th><th>利用制限</th><th>支店名</th><th>部署・役職</th><th>削除実行</th>
 		</tr>
 		<c:forEach items = "${ users }" var = "user" >
 				<tr>
@@ -39,18 +39,36 @@
 					</form>
 					</td>
 					<td>
+					<c:forEach items = "${ branches }" var = "branch">
+						<c:if test = "${ branch.id == user.branchId }">
+							<c:out value = "${ branch.name }"/>
+						</c:if>
+					</c:forEach>
+					</td>
+					<td>
+					<c:forEach items = "${ positions }" var = "position">
+						<c:if test = "${ position.id == user.positionId }">
+							<c:out value = "${ position.name }"/>
+						</c:if>
+					</c:forEach>
+					</td>
+					<td>
 					<form action = "usercontroll" method = "post" >
 						<c:if test = "${ user.useable == true }"  >
 							<input type = "hidden" name = "useable" value = "false">
 							<input type = "hidden" name = "userId" value = "${ user.id }">
-							<input type = "submit" name = "useableButton" value = "停止" onClick = "return confirm('本当に${ user.name }を停止してよろしいですか？')">
+							<input type = "submit" name = "useableButton" value = "停止"
+							onClick = "return confirm('本当に${ user.name }を停止してよろしいですか？')"
+							<c:if test = "${ loginUser.id == user.id }">disabled="disabled"</c:if>>
 						</c:if>
 					</form>
 					<form action = "usercontroll" method = "post">
 						<c:if test = "${ user.useable == false }"  >
 							<input type = "hidden" name = "useable" value = "true">
 							<input type = "hidden" name = "userId" value = "${ user.id }">
-							<input type = "submit" name = "useableButton" value = "復活" onClick = "return confirm('本当に${ user.name }を復活させてよろしいですか？')">
+							<input type = "submit" name = "useableButton" value = "復活"
+							onClick = "return confirm('本当に${ user.name }を復活させてよろしいですか？')"
+							<c:if test = "${ loginUser.id == user.id }">disabled="disabled"</c:if>>
 						</c:if>
 					</form>
 					</td>
@@ -58,7 +76,8 @@
 						<form action = "usercontroll" method = "post">
 						<input type = "hidden" name = "delete" value = "1">
 						<input type = "hidden" name = "userId" value = "${ user.id }">
-						<input type = "submit" name = "delete" value = "削除" onClick = "return confirm('本当に${ user.name }を削除してよろしいですか？')">
+						<input type = "submit" name = "delete" value = "削除" onClick = "return confirm('本当に${ user.name }を削除してよろしいですか？')"
+						<c:if test = "${ loginUser.id == user.id }">disabled="disabled"</c:if>>
 						</form>
 
 					</td>

@@ -8,7 +8,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<title>${ editUser.name }さんの編集画面</title>
+<title>編集画面</title>
+<c:if test = "${ not empty error}">
+	<meta http-equiv="refresh" content="5;URL=usercontroll">
+</c:if>
 
 </head>
 <body>
@@ -23,9 +26,14 @@
 	<c:remove var = "errorMessages" scope = "session" />
 </c:if>
 
+<c:if test = "${not empty error}">
+	編集画面に飛ぶにはユーザー管理画面からやり直してください。5秒後に遷移します。
+	遷移しない場合はリンクをクリックしてください
+	<a href = "usercontroll">ユーザー管理画面</a>
 
+</c:if>
 
-
+<c:if test = "${ empty error}">
 <form action = "edituser" method = "post">
 		<label for = "loginId" >ログインID</label>
 		<input name = "loginId" value = "${ editUser.loginId }" id = "loginId" /><br />
@@ -69,10 +77,12 @@
 		<br />
 
 	<input type = "submit" value = "登録" /><br />
-	<a href = "usercontroll">戻る</a>
+	<a href = "usercontroll">ユーザー管理画面へ戻る</a>
 
 
 </form>
+</c:if>
+
 
 
 

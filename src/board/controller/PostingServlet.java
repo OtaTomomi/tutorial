@@ -69,19 +69,19 @@ public class PostingServlet extends HttpServlet{
 			messages.add("件名を入力してください");
 		}
 		if(50 < subject.length()){
-			messages.add("50字以下で入力してください");
+			messages.add("件名は50字以下で入力してください");
 		}
 		if(StringUtils.isBlank(text) == true){
 			messages.add("本文を入力してください");
 		}
 		if(10000 < text.length()){
-			messages.add("10000字以下で入力してください");
+			messages.add("本文は10000字以下で入力してください");
 		}
 		if(StringUtils.isBlank(category) == true){
 			messages.add("カテゴリーを入力してください");
 		}
 		if(10 < category.length()){
-			messages.add("10字以下で入力してください");
+			messages.add("カテゴリーは10字以下で入力してください");
 		}
 		if(messages.size() == 0){
 			return true;

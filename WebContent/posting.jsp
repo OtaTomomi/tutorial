@@ -24,16 +24,16 @@
 	<form action = "posting" method = "post"><br />
 		<div class = "form-area">
 			件名<br />
-			<textarea name = "subject" cols = "100" rows = "1" class = "class-box"><c:if test = "${ message != null }"><c:out value = "${ message.subject}" /></c:if></textarea>
+			<input type = "text" name = "subject"<c:if test = "${ message != null }"> value = "${ message.subject}"</c:if> size = "100">
 			<br />
 			本文<br />
 			<textarea name = "text" cols = "100" rows = "10" class = "text-box"><c:if test = "${ message != null }"><c:out value = "${ message.text}" /></c:if></textarea>
 			<br />
 			カテゴリー<br />
-			<input type = "text" name = "category"<c:if test = "${ message != null }"> value = "${ message.category}"</c:if> >
+			<input type = "text" name = "category"<c:if test = "${ message != null }"> value = "${ message.category}"</c:if> size = "100">
 			<c:remove var = "message" scope = "session" />
 			<br />
-			<input type = "submit" value = "投稿">
+			<input type = "submit" value = "投稿" >
 		</div>
 	</form>
 <a href = "home">戻る</a>

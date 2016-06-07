@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 
 import board.beans.Comment;
+import board.beans.SplitDate;
 import board.beans.User;
 import board.beans.UserComment;
 import board.beans.UserMessage;
@@ -32,6 +33,8 @@ public class HomeServlet extends HttpServlet{
 	ServletException{
 
 		List<UserComment> userComments = new CommentService().getComment();
+		SplitDate minDate = new MessageService().getMessageMinDate();
+		SplitDate maxDate = new MessageService().getMessageMaxDate();
 
 		ArrayList<Integer> years = new ArrayList<Integer>();
 		for(int i = 2000 ; i < 2020 ; i ++){
@@ -47,18 +50,27 @@ public class HomeServlet extends HttpServlet{
 		}
 
 		if (request.getParameter("search") != null){
-
-			//検索値受け取り処理
 			int beginYear = Integer.parseInt(request.getParameter("beginYear"));
 			int beginMonth = Integer.parseInt(request.getParameter("beginMonth"));
 			int beginDay = Integer.parseInt(request.getParameter("beginDay"));
 			int endYear = Integer.parseInt(request.getParameter("endYear"));
 			int endMonth = Integer.parseInt(request.getParameter("endMonth"));
 			int endDay = Integer.parseInt(request.getParameter("endDay"));
+
+
+
+
+			SplitDate searchBeginDate = new SplitDate();
+			SplitDate searchEndDate = new SplitDate();
+			searchBeginDate.setYear(request.getParameter("beginYear"));
+			searchBeginDate.setMonth(request.getParameter("beginMonth"));
+			searchBeginDate.setDay(request.getParameter("beginDay"));
+			searchEndDate.setYear(request.getParameter("endYear"));
+			searchEndDate.setMonth(request.getParameter("endMonth"));
+			searchEndDate.setDay(request.getParameter("endDay"));
 			String category = request.getParameter("category");
 
 			if(StringUtils.isBlank(category) == true){
-				System.out.println("実行A");
 
 				List<UserMessage> userMessageMatchDateOnly = new MessageService().getMessageMatchDateOnly(beginYear, beginMonth, beginDay, endYear, endMonth, endDay);
 				System.out.println(userMessageMatchDateOnly.size());
@@ -67,11 +79,11 @@ public class HomeServlet extends HttpServlet{
 				request.setAttribute("years", years);
 				request.setAttribute("months", months);
 				request.setAttribute("days", days);
+				request.setAttribute("beginDate",searchBeginDate);
+				request.setAttribute("endDate",searchEndDate);
 				request.getRequestDispatcher("home.jsp").forward(request, response);
 
 			}else{
-				System.out.println("実行B");
-
 				List<UserMessage> userMessageMatchDateAndCategories = new MessageService().getMessageMatchDateAndCategory(category,beginYear, beginMonth, beginDay, endYear, endMonth, endDay);
 
 				request.setAttribute("userMessages", userMessageMatchDateAndCategories);
@@ -79,19 +91,22 @@ public class HomeServlet extends HttpServlet{
 				request.setAttribute("years", years);
 				request.setAttribute("months", months);
 				request.setAttribute("days", days);
+				request.setAttribute("beginDate",searchBeginDate);
+				request.setAttribute("endDate",searchEndDate);
+				request.setAttribute("category",category);
 				request.getRequestDispatcher("home.jsp").forward(request, response);
-
 			}
 
 		} else {
 			request.setAttribute("years", years);
 			request.setAttribute("months", months);
 			request.setAttribute("days", days);
+			request.setAttribute("beginDate", minDate);
+			request.setAttribute("endDate", maxDate);
 			List<UserMessage> userMessages = new MessageService().getMessage();
 			List<User> users = new UserService().getUser();
 			request.setAttribute("userMessages", userMessages);
 			request.setAttribute("users", users);
-
 			request.setAttribute("userComments", userComments);
 			request.getRequestDispatcher("home.jsp").forward(request, response);
 
@@ -110,7 +125,6 @@ public class HomeServlet extends HttpServlet{
 
 
 		if (reset != null){
-			System.out.println("実行C");
 
 			response.sendRedirect("home");
 		}  else {
@@ -125,9 +139,8 @@ public class HomeServlet extends HttpServlet{
 				response.sendRedirect("home");
 
 
-
-			}else {
-
+			}
+			if(request.getParameter("messageId") != null){
 
 				if(isValid(request, messages) == true){
 
@@ -149,12 +162,7 @@ public class HomeServlet extends HttpServlet{
 			}
 
 		}
-
-
-
-
-
-		}
+	}
 
 
 

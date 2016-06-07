@@ -45,6 +45,7 @@ public class LoginServlet extends HttpServlet{
 			if(useable == false){
 				List<String> messages = new ArrayList<String>();
 				messages.add("このアカウントは停止されています。");
+				session.setAttribute("loginId",loginId);
 				session.setAttribute("errorMessages", messages);
 				response.sendRedirect("login");
 			} else {
@@ -55,6 +56,7 @@ public class LoginServlet extends HttpServlet{
 		} else {
 			List<String> messages = new ArrayList<String>();
 			messages.add("ログインに失敗しました");
+			session.setAttribute("loginId",loginId);
 			session.setAttribute("errorMessages", messages);
 			response.sendRedirect("login");
 		}

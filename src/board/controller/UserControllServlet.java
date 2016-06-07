@@ -11,8 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import board.beans.Branch;
+import board.beans.Position;
 import board.beans.User;
 import board.exception.NoRowsUpdatedRuntimeException;
+import board.service.BranchService;
+import board.service.PositionService;
 import board.service.UserService;
 
 @WebServlet(urlPatterns = {"/usercontroll"})
@@ -23,6 +27,10 @@ public class UserControllServlet extends HttpServlet{
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws IOException,
 	ServletException {
+		List<Branch> branches = new BranchService().getBranch();
+		request.setAttribute("branches", branches);
+		List<Position> positions = new PositionService().getPosition();
+		request.setAttribute("positions", positions);
 		List<User> users = new UserService().getUser();
 		request.setAttribute("users", users);
 		request.getRequestDispatcher("usercontroll.jsp").forward(request, response);

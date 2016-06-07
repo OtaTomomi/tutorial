@@ -87,7 +87,7 @@ public class EditUserCheckServlet extends HttpServlet{
 				request.getRequestDispatcher("edituser.jsp").forward(request, response);
 			}
 
-			request.getRequestDispatcher("omedetou.jsp").forward(request, response);
+			response.sendRedirect("usercontroll");
 
 		}
 

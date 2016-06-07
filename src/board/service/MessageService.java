@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import board.beans.Message;
+import board.beans.SplitDate;
 import board.beans.UserMessage;
 //import board.beans.UserMessage;
 import board.dao.MessageDao;
@@ -70,7 +71,7 @@ public class MessageService {
 			String beginDate = String.valueOf(beginYear) + "-" +
 					String.valueOf(beginMonth) + "-" + String.valueOf(beginDay);
 				String endDate = String.valueOf(endYear) + "-" +
-						String.valueOf(endMonth) + "-" + String.valueOf(endDay) ;
+						String.valueOf(endMonth) + "-" + String.valueOf(endDay) + " 23:59:59";
 
 			UserMessageDao userMessageDao = new UserMessageDao();
 			List<UserMessage> ret = userMessageDao.getUserMessageMatchDateAndCategory(connection,category,
@@ -95,7 +96,7 @@ public class MessageService {
 			String beginDate = String.valueOf(beginYear) + "-" +
 				String.valueOf(beginMonth) + "-" + String.valueOf(beginDay);
 			String endDate = String.valueOf(endYear) + "-" +
-					String.valueOf(endMonth) + "-" + String.valueOf(endDay) ;
+					String.valueOf(endMonth) + "-" + String.valueOf(endDay) + " 23:59:59";
 
 			Connection connection = null;
 			try{
@@ -141,6 +142,51 @@ public class MessageService {
 				close(connection);
 			}
 
+		}
+		public SplitDate getMessageMaxDate(){
+
+			Connection connection = null;
+			try{
+				connection = getConnection();
+
+				MessageDao messageDao = new MessageDao();
+				SplitDate maxDate = messageDao.getMessageMaxDate(connection);
+
+				commit(connection);
+
+				return maxDate;
+			}catch (RuntimeException e){
+				rollback(connection);
+				throw e;
+			} catch (Error e){
+				rollback(connection);
+				throw e;
+			} finally {
+				close(connection);
+
+			}
+		}
+		public SplitDate getMessageMinDate(){
+
+			Connection connection = null;
+			try{
+				connection = getConnection();
+
+				MessageDao messageDao = new MessageDao();
+				SplitDate minDate = messageDao.getMessageMinDate(connection);
+
+				commit(connection);
+
+				return minDate;
+			}catch (RuntimeException e){
+				rollback(connection);
+				throw e;
+			} catch (Error e){
+				rollback(connection);
+				throw e;
+			} finally {
+				close(connection);
+			}
 		}
 
 

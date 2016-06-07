@@ -30,18 +30,36 @@ public class EditUserServlet extends HttpServlet{
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
 
+		if(request.getParameter("userId") != null){
 
-		int editId = Integer.parseInt(request.getParameter("userId"));
+			int editId = Integer.parseInt(request.getParameter("userId"));
 
-		User editUser = new UserService().getUserInfomation(editId);
-		request.setAttribute("editUser", editUser);
+			User editUser = new UserService().getUserInfomation(editId);
 
-		List<Branch> branches = new BranchService().getBranch();
-		request.setAttribute("branches", branches);
-		List<Position> positions = new PositionService().getPosition();
-		request.setAttribute("positions", positions);
+			if(editUser != null){
 
-		request.getRequestDispatcher("edituser.jsp").forward(request, response);
+				request.setAttribute("editUser", editUser);
+
+				List<Branch> branches = new BranchService().getBranch();
+				request.setAttribute("branches", branches);
+				List<Position> positions = new PositionService().getPosition();
+				request.setAttribute("positions", positions);
+				request.getRequestDispatcher("edituser.jsp").forward(request, response);
+
+
+			}else{
+				request.setAttribute("error", 1);
+				request.getRequestDispatcher("edituser.jsp").forward(request, response);
+
+
+			}
+
+		}else{
+			request.setAttribute("error", 1);
+			request.getRequestDispatcher("edituser.jsp").forward(request, response);
+
+
+		}
 
 	}
 	@Override

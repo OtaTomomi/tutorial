@@ -24,10 +24,11 @@
 </c:if>
 <form action = "login" method = "post"><br />
 	<label for = "loginId">ログインID</label>
-	<input name = "loginId" id = "loginId" /><br />
+	<input name = "loginId" value = "${ loginId }" id = "loginId" /><br />
 
 	<label for = "password">パスワード</label>
 	<input name = "password" type = "password" id = "password" /><br />
+	<c:remove var = "loginId" scope = "session" />
 
 	<input type = "submit" value = "ログイン" /><br />
 <%--

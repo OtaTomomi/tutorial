@@ -46,6 +46,7 @@
 				<c:out value = "${ position.name }" /><br />
 			</c:if>
 		</c:forEach>
+		<br />
 
 		<!------------------>
 		<input type = "hidden" value = "${ editUser.id }" name = id />
@@ -59,7 +60,7 @@
 
 
 
-	<input type = "submit" value = "登録" /><br />
+	<input type = "submit" value = "この内容で登録"onClick = "confirm('登録しました')"/><br />
 </form>
 <form action = "editusercheck" method = "post">
 
@@ -70,7 +71,8 @@
 		<input type = "hidden" value = "${ editUser.branchId }" name = branchId />
 		<input type = "hidden" value = "${ editUser.positionId }" name = positionId />
 		<input type = "hidden" value = "1" name = "revision" />
-	<input type  = "submit" value = "変更" /><br />
+	<input type  = "submit" value = "編集内容を変更" /><br />
+	<a href = "usercontroll">ユーザー管理画面へ戻る</a>
 </form>
 </body>
 </html>
